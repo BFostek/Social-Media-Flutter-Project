@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class PostActions extends StatelessWidget {
-  const PostActions({
+  late String likes;
+  PostActions({
     Key? key,
+    required this.likes,
   }) : super(key: key);
 
   @override
@@ -18,8 +20,8 @@ class PostActions extends StatelessWidget {
                 color: Colors.white,
                 size: 13,
               )),
-          const Text(
-            "32",
+          Text(
+            likes,
             style: TextStyle(color: Colors.white, fontSize: 13),
           ),
         ]));

@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:social_media/database/db_firestore.dart';
 
 class AuthException implements Exception {
   String message;
@@ -9,11 +11,13 @@ class AuthException implements Exception {
 
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  late FirebaseFirestore db;
   User? usuario;
   bool isLoading = true;
 
   AuthService() {
     _authCheck();
+    _startFirestore();
   }
 
   _authCheck() {
@@ -24,10 +28,21 @@ class AuthService extends ChangeNotifier {
     });
   }
 
+  _startFirestore() async {
+    db = DbFirestore.get();
+    print(db);
+  }
+
+  createUser(String email) async {
+    await db.collection('users').add({'AuthorId': usuario!.uid, 'mail': email});
+  }
+
   register(String email, String senha) async {
     try {
       await _auth.createUserWithEmailAndPassword(email: email, password: senha);
       _getUser();
+      await createUser(email);
+      notifyListeners();
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'weak-password':
